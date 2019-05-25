@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (C) 2010 The Android Open Source Project
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+          http://www.apache.org/licenses/LICENSE-2.0
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License.
+-->
+<!-- Top-level content view for the simple fragment sample. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:padding="4dip"
+    android:gravity="center"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/tv_medicare_popup_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Downloading New Content"
+        android:textColor="@color/cyan"
+        android:textSize="@dimen/activity_text_size_bit_large"
+        android:textStyle="bold"
+        android:layout_gravity="center_horizontal"
+        android:layout_margin="@dimen/activity_text_size_small"/>
+
+    <ImageView
+        android:layout_width="75dp"
+        android:layout_height="75dp"
+        android:layout_gravity="center|top"
+        android:layout_margin="@dimen/activity_text_size_small"
+        android:scaleType="fitXY"
+        android:textStyle="bold"
+        android:id="@+id/iv_download_progress"
+        android:src="@drawable/download_progress_2"/>
+
+    <ScrollView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+        <GridLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/gl_progress_bars"
+            android:paddingBottom="@dimen/activity_text_size_medium"
+            android:paddingLeft="@dimen/activity_text_size_medium_plus"
+            android:paddingRight="@dimen/activity_text_size_medium_plus">
+        </GridLayout>
+    </ScrollView>
+    <Button
+        android:id="@+id/bt_download_progress_dismiss"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center|bottom"
+        android:background="@drawable/button_iphone_app_red_no_height"
+        android:textSize="@dimen/activity_text_size_large"
+        android:textAllCaps="false"
+        android:textColor="@color/white"
+        android:layout_margin="@dimen/activity_horizontal_margin"
+        android:shadowColor="@color/black"
+        android:shadowDx="0"
+        android:shadowDy="0"
+        android:shadowRadius="5"
+        android:text="Dismiss" />
+</LinearLayout>
