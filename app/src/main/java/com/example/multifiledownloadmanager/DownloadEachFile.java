@@ -1,5 +1,6 @@
 package com.example.multifiledownloadmanager;
 
+import android.app.DownloadManager;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.net.Uri;
@@ -16,67 +17,90 @@ public class DownloadEachFile {
     private static final String TAG = "DownloadEachFile";
     private Context ctx;
     private View download_progress_view;
-    ProgressDialog progressDialog;
-    int mDownloadProgress=0;
+    private ProgressBar progressBar;
+    private String fileTitle;
+    private int current_row_count;
+    private String dialogTitle;
+    private String dialogMsg;
+    private boolean isDownloadComplete;
+    private ImageView progressCompletedImageView;
+    private ImageView fileInfoImageView;
 
-    public DownloadEachFile(Context inCtx, View in_download_progress_view) {
+    private int downloadProgress=0;
+
+    public DownloadEachFile(Context inCtx, View in_download_progress_view,
+                            String inFileTitle, int in_current_row_count, String inDialogTitle,
+                            String inDialogMsg) {
         ctx = inCtx;
         download_progress_view = in_download_progress_view;
+        fileTitle = inFileTitle;
+        current_row_count = in_current_row_count;
+        dialogTitle = inDialogTitle;
+        dialogMsg = inDialogMsg;
+        isDownloadComplete = false;
     }
 
     public long createEachFileDownload(String file_name, String file_url) {
         File file = new File(ctx.getExternalFilesDir(null), file_name);
         Uri fileUri = Uri.parse(file_url);
 
-       /*
-       Create a MultiFileDownloadManager.Request with all the information necessary to start the download
-        */
-        android.app.DownloadManager.Request request=new android.app.DownloadManager.Request(fileUri)
-                .setTitle("Lesson Content")// Title of the Download Notification
-                .setDescription("Downloading")// Description of the Download Notification
-                .setNotificationVisibility(android.app.DownloadManager.Request.VISIBILITY_VISIBLE) // Visibility of the download Notification
-                .setDestinationUri(Uri.fromFile(file))// Uri of the destination file
-                .setRequiresCharging(false)// Set if charging is required to begin the download
-                .setAllowedOverMetered(true)// Set if download is allowed on Mobile network
-                .setAllowedOverRoaming(true);// Set if download is allowed on roaming network
+        final String description = "Downloading " + fileTitle;
+        final int visibility = DownloadManager.Request.VISIBILITY_VISIBLE;
 
-        android.app.DownloadManager downloadManager= (android.app.DownloadManager) ctx.getSystemService(DOWNLOAD_SERVICE);
+        // Create a Request with all the information necessary to start the download
+        DownloadManager.Request request=new DownloadManager.Request(fileUri)
+                .setTitle(fileTitle)                   // Title of the Download Notification
+                .setDescription(description)           // Description of the Download Notification
+                .setNotificationVisibility(visibility) // Visibility of the download Notification
+                .setDestinationUri(Uri.fromFile(file)) // Uri of the destination file
+                .setRequiresCharging(false)            // Set if charging is required to begin the download
+                .setAllowedOverMetered(true)           // Set if download is allowed on Mobile network
+                .setAllowedOverRoaming(true);          // Set if download is allowed on roaming network
+
+        DownloadManager downloadManager= (DownloadManager) ctx.getSystemService(DOWNLOAD_SERVICE);
         long downloadID = downloadManager.enqueue(request);// enqueue puts the download request in the queue.
 
+        setupProgressBar();
         return downloadID;
     }
 
-    private void setupProgressDialog(String fileTitle, int current_row_count,
-                                     String dialogTitle, String dialogMsg) {
-        progressDialog = new ProgressDialog(ctx);
+    private void setupProgressBar() {
         try {
             Log.i(TAG, "Adding Progress Bar to Alert");
             Context local_ctx = download_progress_view.getContext();
-            ProgressBar progressBar = new ProgressBar(local_ctx, null,
+            progressBar = new ProgressBar(local_ctx, null,
                     android.R.attr.progressBarStyleHorizontal);
-            ImageView progressCompletedImageView = new ImageView(local_ctx);
-            if(fileTitle==null) {
-                GridButtonLayout.addProgressBar(download_progress_view,
-                        "Download " + current_row_count,
-                        progressBar,
-                        progressCompletedImageView, current_row_count);
-            } else {
-                GridButtonLayout.addProgressBar(download_progress_view, fileTitle,
-                        progressBar, progressCompletedImageView, current_row_count);
-            }
-            progressDialog.setTitle(dialogTitle);
-            progressDialog.setMessage(dialogMsg);
-            progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-            progressDialog.setCancelable(false);
-            progressDialog.setProgress(0);
-            progressDialog.setMax(100);
-            progressDialog.show();
+            progressCompletedImageView = new ImageView(local_ctx);
+            fileInfoImageView = new ImageView(local_ctx);
+            GridButtonLayoutHelper.addProgressBar(download_progress_view, "test",
+                    progressBar, progressCompletedImageView,fileInfoImageView,
+                    current_row_count);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public ProgressDialog getProgressDialog() {
-        return progressDialog;
+    public ProgressBar getProgressBar() {
+        return progressBar;
+    }
+
+    public int getDownloadProgress() {
+        return downloadProgress;
+    }
+
+    public void setDownloadProgress(int downloadProgress) {
+        this.downloadProgress = downloadProgress;
+    }
+
+    public boolean isDownloadComplete() {
+        return isDownloadComplete;
+    }
+
+    public void setDownloadComplete(boolean downloadComplete) {
+        isDownloadComplete = downloadComplete;
+    }
+
+    public ImageView getProgressCompletedImageView() {
+        return progressCompletedImageView;
     }
 }

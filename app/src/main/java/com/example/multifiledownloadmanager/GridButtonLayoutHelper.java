@@ -9,11 +9,11 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-public class GridButtonLayout {
+public class GridButtonLayoutHelper {
 
     public static void addProgressBar(View alert_dialog_view, String display_text,
-                                      ProgressBar progressBar, ImageView imageView,
-                                      int current_row_count) {
+                                      ProgressBar progressBar, ImageView progressDoneImageView,
+                                      ImageView fileInfoImageView, int current_row_count) {
 
 
         Context ctx = alert_dialog_view.getContext();
@@ -81,6 +81,41 @@ public class GridButtonLayout {
         progressBar.setProgress(0);
         progressBar.setLayoutParams(gridLayoutParamsProgressBar);
 
+
+        /*
+        <ImageView
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_gravity="center|top"
+            android:layout_margin="@dimen/activity_text_size_small_plus"
+            android:scaleType="fitXY"
+            android:textStyle="bold"
+            android:id="@+id/iv_download_progress_ok"
+            android:src="@drawable/checked"
+            android:layout_column="2"
+            android:layout_row="0"/>
+         */
+
+
+        GridLayout.LayoutParams gridLayoutParamsFileInfoImageView = new GridLayout.LayoutParams(
+                GridLayout.spec(current_row_count),
+                GridLayout.spec(2));
+
+        int iv_layout_margin = (int) ctx.getResources().getDimension(R.dimen.activity_text_size_very_very_small);
+
+        gridLayoutParamsFileInfoImageView.setMargins(iv_layout_margin,
+                (int) ctx.getResources().getDimension(R.dimen.activity_text_size_very_small),
+                iv_layout_margin,
+                iv_layout_margin);
+
+        gridLayoutParamsFileInfoImageView.setGravity(Gravity.CENTER | Gravity.TOP);
+        gridLayoutParamsFileInfoImageView.width = (int) ctx.getResources().getDimension(R.dimen.activity_text_size_large);
+        gridLayoutParamsFileInfoImageView.height = (int) ctx.getResources().getDimension(R.dimen.activity_text_size_large);
+        fileInfoImageView.setLayoutParams(gridLayoutParamsFileInfoImageView);
+        fileInfoImageView.setImageDrawable(ctx.getDrawable(R.drawable.info_32));
+        fileInfoImageView.setScaleType(ImageView.ScaleType.FIT_XY);
+        fileInfoImageView.setVisibility(View.VISIBLE);
+
         /*
         <ImageView
             android:layout_width="25dp"
@@ -96,9 +131,7 @@ public class GridButtonLayout {
          */
         GridLayout.LayoutParams gridLayoutParamsImageView = new GridLayout.LayoutParams(
                 GridLayout.spec(current_row_count),
-                GridLayout.spec(2));
-
-        int iv_layout_margin = (int) ctx.getResources().getDimension(R.dimen.activity_text_size_very_very_small);
+                GridLayout.spec(3));
 
         gridLayoutParamsImageView.setMargins(iv_layout_margin,
                 (int) ctx.getResources().getDimension(R.dimen.activity_text_size_very_small),
@@ -108,14 +141,15 @@ public class GridButtonLayout {
         gridLayoutParamsImageView.setGravity(Gravity.CENTER | Gravity.TOP);
         gridLayoutParamsImageView.width = (int) ctx.getResources().getDimension(R.dimen.activity_text_size_large);
         gridLayoutParamsImageView.height = (int) ctx.getResources().getDimension(R.dimen.activity_text_size_large);
-        imageView.setLayoutParams(gridLayoutParamsImageView);
-        imageView.setImageDrawable(ctx.getDrawable(R.drawable.checked));
-        imageView.setScaleType(ImageView.ScaleType.FIT_XY);
-        imageView.setVisibility(View.INVISIBLE);
+        progressDoneImageView.setLayoutParams(gridLayoutParamsImageView);
+        progressDoneImageView.setImageDrawable(ctx.getDrawable(R.drawable.checked));
+        progressDoneImageView.setScaleType(ImageView.ScaleType.FIT_XY);
+        progressDoneImageView.setVisibility(View.INVISIBLE);
 
         gridLayout.addView(textView);
         gridLayout.addView(progressBar);
-        gridLayout.addView(imageView);
+        gridLayout.addView(fileInfoImageView);
+        gridLayout.addView(progressDoneImageView);
 
     }
 }

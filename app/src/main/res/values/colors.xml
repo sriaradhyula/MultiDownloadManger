@@ -2,6 +2,7 @@
 <resources>
     <color name="colorPrimary">#008577</color>
     <color name="colorPrimaryDark">#00574B</color>
+    <color name="proveit_blue">#00428b</color>
     <color name="colorAccent">#D81B60</color>
     <color name="cyan">#26C6DA</color>
     <color name="white">#FFFFFF</color>
