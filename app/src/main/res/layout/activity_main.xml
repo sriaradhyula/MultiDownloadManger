@@ -7,11 +7,24 @@
     tools:context=".MainActivity">
 
     <Button
-        android:layout_width="wrap_content"
+        android:layout_width="200dp"
         android:id="@+id/bt_download_files"
+        android:layout_margin="@dimen/activity_text_size_large"
+        android:background="@color/colorPrimary"
         android:text="Download Files"
         android:layout_centerInParent="true"
         android:gravity="center_vertical|center_horizontal"
+        android:layout_height="wrap_content" />
+
+    <Button
+        android:layout_width="200dp"
+        android:layout_margin="@dimen/activity_text_size_large"
+        android:background="@color/cyan"
+        android:id="@+id/bt_download_status"
+        android:text="Download Status"
+        android:layout_centerInParent="true"
+        android:gravity="center_vertical|center_horizontal"
+        android:layout_below="@id/bt_download_files"
         android:layout_height="wrap_content" />
 
 </RelativeLayout>

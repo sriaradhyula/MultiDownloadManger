@@ -101,4 +101,5 @@
     <dimen name="popup_selection_height">100dp</dimen>
     <dimen name="popup_selection_short_width">100dp</dimen>
     <dimen name="popup_selection_long_width">300dp</dimen>
+    <dimen name="text_margin">16dp</dimen>
 </resources>

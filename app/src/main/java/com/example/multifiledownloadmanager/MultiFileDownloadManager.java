@@ -20,6 +20,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 import static android.content.Context.DOWNLOAD_SERVICE;
+import static android.text.format.Formatter.formatFileSize;
 import static com.example.multifiledownloadmanager.Constants.files;
 
 public class MultiFileDownloadManager {
@@ -76,6 +77,7 @@ public class MultiFileDownloadManager {
         String file_name;
         String file_url;
         int current_row_count = 0;
+        Log.i(TAG, files.toString());
         while (it.hasNext()) {
             Map.Entry pair = (Map.Entry)it.next();
             file_name = (String) pair.getKey();
@@ -84,14 +86,13 @@ public class MultiFileDownloadManager {
 
             //Download Each File
             DownloadEachFile downloadEachFile = new DownloadEachFile(ctx, download_progress_view,
-                    file_name, current_row_count, "test", "test");
+                    file_name, current_row_count, "", "");
             long downloadID = downloadEachFile.createEachFileDownload(file_name, file_url);
+            MultiFileDownloadStatus.getInstance().addNewDownloadedFilePath(downloadID, downloadEachFile.getFilePath());
             downloadIDList.add(downloadID);
             downloadEachFileHashMap.put(downloadID, downloadEachFile);
             eachFileDownloadStatus.put(downloadID, Boolean.FALSE);
 
-            // avoids a ConcurrentModificationException
-            it.remove();
             current_row_count ++;
         }
 
@@ -116,7 +117,7 @@ public class MultiFileDownloadManager {
                     }
                     handler.postDelayed(this, 1000);
                 } else {
-                    //download_progress_dialog.dismiss();
+                    download_progress_dialog.dismiss();
                 }
             }
         }, 1000);
@@ -145,7 +146,8 @@ public class MultiFileDownloadManager {
                     -1);
 
             Log.d(TAG,"localDownloadID: " + localDownloadID);
-            //eachFileDownloadStatus.put(localDownloadID, Boolean.TRUE);
+            eachFileDownloadStatus.put(localDownloadID, Boolean.TRUE);
+            checkEachDownloadStatus(localDownloadID);
         }
     };
 
@@ -176,29 +178,21 @@ public class MultiFileDownloadManager {
         //get the download filename
         String filename = cursor.getString(cursor.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI));
 
-        int bytes_downloaded = cursor.getInt(cursor
+        final int bytes_downloaded = cursor.getInt(cursor
                 .getColumnIndex(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR));
         int bytes_total = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES));
 
-        final int downloadProgress = (int) ((bytes_downloaded * 100l) / bytes_total);
+        int downloadProgress=0;
+        try {
+            downloadProgress = (int) ((bytes_downloaded * 100l) / bytes_total);
+        } catch (ArithmeticException e) {
+            Log.w(TAG, Log.getStackTraceString(e));
+        }
+        final int finalDownloadProgress = downloadProgress;
 
         Log.i("DownloadStatus", "LocalID: " + localDownloadID +  " bytes_downloaded: " +
                 bytes_downloaded + " bytes_total: " + bytes_total + " dl_progress: " +
-                downloadProgress);
-
-        Activity hostActivity = (Activity)ctx;
-        hostActivity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                DownloadEachFile downloadEachFile = downloadEachFileHashMap.get(localDownloadID);
-                downloadEachFile.getProgressBar().setProgress(downloadProgress);
-                if(downloadProgress==100) {
-                    downloadEachFile.getProgressCompletedImageView().setVisibility(View.VISIBLE);
-                    downloadEachFile.setDownloadComplete(true);
-                    eachFileDownloadStatus.put(localDownloadID, Boolean.TRUE);
-                }
-            }
-        });
+                finalDownloadProgress);
 
 
         String statusText = "";
@@ -206,7 +200,7 @@ public class MultiFileDownloadManager {
 
         switch(status){
             case DownloadManager.STATUS_FAILED:
-                statusText = "STATUS_FAILED";
+                statusText = "FAILED";
                 switch(reason){
                     case DownloadManager.ERROR_CANNOT_RESUME:
                         reasonText = "ERROR_CANNOT_RESUME";
@@ -238,7 +232,7 @@ public class MultiFileDownloadManager {
                 }
                 break;
             case DownloadManager.STATUS_PAUSED:
-                statusText = "STATUS_PAUSED";
+                statusText = "PAUSED";
                 switch(reason){
                     case DownloadManager.PAUSED_QUEUED_FOR_WIFI:
                         reasonText = "PAUSED_QUEUED_FOR_WIFI";
@@ -255,18 +249,45 @@ public class MultiFileDownloadManager {
                 }
                 break;
             case DownloadManager.STATUS_PENDING:
-                statusText = "STATUS_PENDING";
+                statusText = "PENDING";
                 break;
             case DownloadManager.STATUS_RUNNING:
-                statusText = "STATUS_RUNNING";
+                statusText = "DOWNLOADING";
 
                 break;
             case DownloadManager.STATUS_SUCCESSFUL:
-                statusText = "STATUS_SUCCESSFUL";
-                reasonText = "Filename:\n" + filename;
+                statusText = "SUCCESSFUL";
                 break;
         }
         cursor.close();
+
+
+        final String download_status = formatFileSize(ctx, bytes_downloaded) +  "/" +
+                formatFileSize(ctx, bytes_total);
+
+        final String finalStatusText = statusText;
+        MultiFileDownloadStatus.getInstance().addNewDownloadedFileStatus(localDownloadID, download_status);
+
+        MultiFileDownloadStatus.getInstance().addNewDownloadedFileStatus(localDownloadID,
+                statusText+ " : " + reasonText);
+
+        
+        Activity hostActivity = (Activity)ctx;
+        hostActivity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                DownloadEachFile downloadEachFile = downloadEachFileHashMap.get(localDownloadID);
+                if(downloadEachFile!=null) {
+                    downloadEachFile.getProgressBar().setProgress(finalDownloadProgress);
+                    downloadEachFile.getDownloadStatusTextView().setText(finalStatusText + " : " + download_status);
+                    if (finalDownloadProgress == 100) {
+                        downloadEachFile.getProgressCompletedImageView().setVisibility(View.VISIBLE);
+                        downloadEachFile.setDownloadComplete(true);
+                        eachFileDownloadStatus.put(localDownloadID, Boolean.TRUE);
+                    }
+                }
+            }
+        });
 
     }
 }

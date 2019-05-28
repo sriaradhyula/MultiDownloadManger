@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import java.io.File;
 
@@ -25,6 +26,8 @@ public class DownloadEachFile {
     private boolean isDownloadComplete;
     private ImageView progressCompletedImageView;
     private ImageView fileInfoImageView;
+    private TextView downloadStatusTextView;
+    private String filePath;
 
     private int downloadProgress=0;
 
@@ -41,6 +44,7 @@ public class DownloadEachFile {
     }
 
     public long createEachFileDownload(String file_name, String file_url) {
+        deleteExistingFile(file_name, true);
         File file = new File(ctx.getExternalFilesDir(null), file_name);
         Uri fileUri = Uri.parse(file_url);
 
@@ -64,16 +68,37 @@ public class DownloadEachFile {
         return downloadID;
     }
 
+    public void deleteExistingFile(String file_name, boolean deleteExistingFile){
+        File file = new File(ctx.getExternalFilesDir(null), file_name);
+        filePath = file.getPath();
+        boolean file_exits = file.exists();
+        Log.i(TAG,file + " File Path : " + file + " doesFileExist: " + file_exits);
+        if(deleteExistingFile && file_exits) {
+            Log.i(TAG, "inside");
+            if(file.delete()) {
+                Log.i(TAG, filePath + " Deleted");
+            } else {
+                Log.d(TAG, "Unable to delete " + filePath);
+            }
+        }
+    }
+
+    public String getFilePath() {
+        return filePath;
+    }
+
     private void setupProgressBar() {
         try {
             Log.i(TAG, "Adding Progress Bar to Alert");
             Context local_ctx = download_progress_view.getContext();
             progressBar = new ProgressBar(local_ctx, null,
                     android.R.attr.progressBarStyleHorizontal);
+            downloadStatusTextView = new TextView(local_ctx);
             progressCompletedImageView = new ImageView(local_ctx);
             fileInfoImageView = new ImageView(local_ctx);
-            GridButtonLayoutHelper.addProgressBar(download_progress_view, "test",
-                    progressBar, progressCompletedImageView,fileInfoImageView,
+
+            GridButtonLayoutHelper.addProgressBar(download_progress_view, fileTitle, "",
+                    progressBar, downloadStatusTextView, progressCompletedImageView,fileInfoImageView,
                     current_row_count);
         } catch (Exception e) {
             e.printStackTrace();
@@ -102,5 +127,9 @@ public class DownloadEachFile {
 
     public ImageView getProgressCompletedImageView() {
         return progressCompletedImageView;
+    }
+
+    public TextView getDownloadStatusTextView() {
+        return downloadStatusTextView;
     }
 }

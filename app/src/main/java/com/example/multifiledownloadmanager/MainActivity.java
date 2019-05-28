@@ -1,11 +1,10 @@
 package com.example.multifiledownloadmanager;
 
-import android.support.v7.app.AlertDialog;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
-import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 
@@ -30,5 +29,15 @@ public class MainActivity extends AppCompatActivity {
                 downloadManager.startDownload();
             }
         });
+
+        final Button downloadStatus = findViewById(R.id.bt_download_status);
+
+        downloadStatus.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                MultiFileDownloadStatus.getInstance().printFilesDownloaded();
+            }
+        });
+
     }
 }

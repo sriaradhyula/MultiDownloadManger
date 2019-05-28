@@ -12,7 +12,9 @@ import android.widget.TextView;
 public class GridButtonLayoutHelper {
 
     public static void addProgressBar(View alert_dialog_view, String display_text,
-                                      ProgressBar progressBar, ImageView progressDoneImageView,
+                                      String download_status, ProgressBar progressBar,
+                                      TextView downloadStatusTextView,
+                                      ImageView progressDoneImageView,
                                       ImageView fileInfoImageView, int current_row_count) {
 
 
@@ -44,6 +46,14 @@ public class GridButtonLayoutHelper {
         textView.setTextColor(ctx.getResources().getColor(R.color.colorPrimaryDark));
         textView.setTextSize(ctx.getResources().getDimension(R.dimen.activity_text_size_large));
 
+        /*
+          New Grid Layout
+         */
+        GridLayout progressBarGrid = new GridLayout(ctx);
+        GridLayout.LayoutParams gridLayoutParamsProgressBarGrid = new GridLayout.LayoutParams(
+                GridLayout.spec(current_row_count),
+                GridLayout.spec(1));
+        progressBarGrid.setLayoutParams(gridLayoutParamsProgressBarGrid);
 
         /*
             <ProgressBar
@@ -61,13 +71,13 @@ public class GridButtonLayoutHelper {
 
          */
         GridLayout.LayoutParams gridLayoutParamsProgressBar = new GridLayout.LayoutParams(
-                GridLayout.spec(current_row_count),
-                GridLayout.spec(1));
+                GridLayout.spec(0),
+                GridLayout.spec(0));
 
         int pb_layout_margin = (int) ctx.getResources().getDimension(R.dimen.dp10);
 
         gridLayoutParamsProgressBar.setMargins(pb_layout_margin,
-                (int) ctx.getResources().getDimension(R.dimen.activity_text_size_small), pb_layout_margin,pb_layout_margin);
+                (int) ctx.getResources().getDimension(R.dimen.activity_text_size_small), pb_layout_margin,0);
 
         gridLayoutParamsProgressBar.width = (int) ctx.getResources().getDimension(R.dimen.popup_selection_long_width);
 
@@ -82,6 +92,34 @@ public class GridButtonLayoutHelper {
         progressBar.setLayoutParams(gridLayoutParamsProgressBar);
 
 
+        /*
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:textSize="@dimen/activity_text_size_large"
+            android:textColor="@color/colorPrimaryDark"
+            android:text="Module 1"
+            android:layout_margin="@dimen/activity_text_size_small"
+            android:layout_row="0"
+            android:layout_column="0"/>
+        */
+        GridLayout.LayoutParams gridLayoutParamsDownloadStatusTextView = new GridLayout.LayoutParams(
+                GridLayout.spec(1),
+                GridLayout.spec(0));
+
+
+        margin_dimension = (int)ctx.getResources().getDimension(R.dimen.activity_text_size_very_very_small);
+        gridLayoutParamsDownloadStatusTextView.setMargins(margin_dimension, margin_dimension, margin_dimension,
+                margin_dimension);
+        gridLayoutParamsDownloadStatusTextView.setGravity(Gravity.RIGHT);
+        downloadStatusTextView.setText(display_text);
+        downloadStatusTextView.setLayoutParams(gridLayoutParamsDownloadStatusTextView);
+        downloadStatusTextView.setTextColor(ctx.getResources().getColor(R.color.proveit_green));
+        downloadStatusTextView.setTextSize(ctx.getResources().getDimension(R.dimen.activity_text_size_very_small));
+
+
+        progressBarGrid.addView(progressBar);
+        progressBarGrid.addView(downloadStatusTextView);
         /*
         <ImageView
             android:layout_width="25dp"
@@ -147,7 +185,7 @@ public class GridButtonLayoutHelper {
         progressDoneImageView.setVisibility(View.INVISIBLE);
 
         gridLayout.addView(textView);
-        gridLayout.addView(progressBar);
+        gridLayout.addView(progressBarGrid);
         gridLayout.addView(fileInfoImageView);
         gridLayout.addView(progressDoneImageView);
 
